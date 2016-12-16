@@ -7,3 +7,9 @@ We examine the notion that cheating or corrupt behavior varies significantly acr
 This repository includes replication code for experimental sessions and data analysis for the manuscript titled “Is Cheating a National Pastime? Experimental Evidence”. 
 
 
+Experimental sessions include:
+ - Santiago 2015 MT - Baseline	
+ - Santiago 2015 MT - Shock	
+ - Santiago 2015 MT - Status	
+ - Santiago 2016 MT - Non-Fixed
+
