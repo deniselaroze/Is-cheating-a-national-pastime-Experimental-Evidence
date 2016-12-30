@@ -12,4 +12,5 @@ Experimental sessions include:
  - Santiago 2015 MT - Shock	
  - Santiago 2015 MT - Status	
  - Santiago 2016 MT - Non-Fixed
+ - Dice images used for the virtual die in the Non-Fixed treatment
 
