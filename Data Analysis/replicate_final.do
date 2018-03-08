@@ -155,9 +155,12 @@ esttab m1 m2 m3 m4 m5 m6 using "`fname'", label mtitle(1 2 3 4 5 6) drop(ncorrec
 
 use "`path'mastern_final2018.dta", clear
 local fname="`path'table_parttype.tex"
+local note = "Average marginal effects for multinomial logistic regression. Dependent variable is whether the subject is a consistent maximal cheater, consistent partial cheater, is consistently honest, or neither of those. Robust standard errors. RET rank is the national rank, between 0 and 1, of subject's national performance at the real effort task. RET Deviation is the difference between actual number of correct additions and one predicted from subject and period FE."
 
-local varlist = "ncorrect_rank male age offerdg_0 offerdg tax_* deadweight mpcr shock status status_H non_fixed"
+
+local varlist = "ncorrect_rank i.male age i.offerdg_0 offerdg i.tax_20 i.tax_30 i.tax_40 i.tax_50 i.deadweight i.mpcr i.shock i.status i.status_H i.non_fixed"
 local varlist2 = " "
+local varlist3 = "0.male 0.offerdg_0 0.tax_20 0.tax_30 0.tax_40 0.tax_50 0.deadweight 0.mpcr 0.shock 0.status 0.status_H 0.non_fixed 0.russia 0.oxford"
 
 
 file open mf using "`fname'", write replace
@@ -166,24 +169,25 @@ file write mf "\begin{tabular}{lcccccccc}" _n
 file write mf "\hline\hline" _n
 file close mf
 
-	mlogit ind_typenew2 `varlist' `varlist2' russia oxford if include_data==1&period2==1, cluster(subj_id)
+	mlogit ind_typenew2 `varlist' `varlist2' i.russia i.oxford if include_data==1&period2==1, robust 
 	est store m
 	forval i=1/4 {
 		est res m
-		margins, dydx(*) predict(outcome(`i')) post
-		test tax_20=tax_30
-		test tax_20=tax_40
-		test tax_20=tax_50
-		test tax_30=tax_40		
-		test tax_30=tax_50
-		test tax_40=tax_50
+		margins, dydx(*) predict(outcome(`i')) post 
+		test 1.tax_20=1.tax_30
+		test 1.tax_20=1.tax_40
+		test 1.tax_20=1.tax_50
+		test 1.tax_30=1.tax_40		
+		test 1.tax_30=1.tax_50
+		test 1.tax_40=1.tax_50
 		*test status_H=status_L
 		est store m`i'
 	}
 	
-	esttab m1 m2 m3 m4 using "`fname'", drop(`varlist2') label mtitle("Consistent maximal" "Consistent partial" "Consistently honest" "Other") wide compress nonum title(`tt') append fragment  prehead(&\multicolumn{6}{c}{\bf `tt'}\\) postfoot(\hline\hline)
+	esttab m1 m2 m3 m4 using "`fname'", drop(`varlist3') label mtitle("Consistent maximal" "Consistent partial" "Consistently honest" "Other") wide compress nonum title(`tt') append fragment  prehead(&\multicolumn{6}{c}{\bf `tt'}\\) postfoot(\hline\hline) se star(* 0.10 ** 0.05 *** 0.01)
 file open mf using "`fname'", write append
-file write mf "\multicolumn{9}{l}{\footnotesize \sym{*} \(p<0.05\), \sym{**} \(p<0.01\), \sym{***} \(p<0.001\)}\\" _n
+file write mf "\multicolumn{9}{p{17cm}}{\tiny `note'}\\" _n
+file write mf "\multicolumn{9}{l}{\tiny \sym{*} \(p<0.1\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\" _n
 file write mf "\end{tabular}"
 file close mf
 
@@ -195,8 +199,8 @@ file close mf
 *******************************************************************************
 
 use "`path'mastern_final2018.dta", clear
-local varlist_3_all "tax_40 tax_50 deadweight mpcr russia oxford" 
-local varlist_3_uk "tax_40 tax_50 deadweight mpcr"
+local varlist_3_all "i.tax_40 i.tax_50 i.deadweight i.mpcr i.russia i.oxford" 
+local varlist_3_uk "i.tax_40 i.tax_50 i.deadweight i.mpcr"
 
 
 
@@ -205,22 +209,24 @@ local varlist_3_uk "tax_40 tax_50 deadweight mpcr"
 ********************************************************************************
 local fname="`path'table_reduced1_10.tex"
 local conds "1==1 country_code==1 country_code==2 country_code==3"
-local varlist4="shock shock_H status status_H non_fixed"
-local varlist = "ncorrect_rank ncorrect_dev2 male age period2 offerdg_0 offerdg tax_20 tax_30"
-local varlist2 = " "
-local note = "OLS regressions. Clustered SE. RET rank is the national rank, between 0 and 1, of subject's national performance at the real effort task. RET Deviation is the difference between actual number of correct additions and one predicted from subject and period FE."
-
-
+local varlist4="i.shock i.shock_H i.status i.status_H i.non_fixed"
+local varlist = "ncorrect_rank ncorrect_dev2 i.male age period2 i.offerdg_0 offerdg i.tax_20 i.tax_30"
+local varlist2_0 = "0.tax_20 0.tax_30 0.shock 0.shock_H 0.status 0.status_H 0.non_fixed 0.male 0.offerdg_0"
+local varlist2_4 = "0.tax_20 0.tax_30 0.tax_40 0.tax_50 0.mpcr 0.deadweight 0.shock 0.shock_H 0.status 0.status_H 0.non_fixed 0.male 0.offerdg_0"
+local varlist2_1 = "0.russia 0.oxford 0.tax_20 0.tax_30 0.tax_40 0.tax_50 0.mpcr 0.deadweight 0.shock 0.shock_H 0.status 0.status_H 0.non_fixed 0.male 0.offerdg_0"
+local note = "Average marginal effects for multinomial logistic regression. Dependent variable is whether the subject declared 0\%, 100\%, or something in between, in a given round. Standard errors are clustered by subject. RET rank is the national rank, between 0 and 1, of subject's national performance at the real effort task. RET Deviation is the difference between actual number of correct additions and one predicted from subject and period FE."
+              
 ********************************************************************************
 **************** PERIODS 2-10, PAST ACTIONS ********************************
 ********************************************************************************
 local fname="`path'table_reduced2_10.tex"
 local conds "1==1&period2>1 country_code==1&period2>1 country_code==2&period2>1 country_code==3&period2>1"
-local varlist4="shock shock_H status status_H non_fixed l0 lf l_declim l_others"
-local varlist = "ncorrect_rank ncorrect_dev2 male age period2 offerdg_0 offerdg tax_20 tax_30"
-local varlist2_1 = "tax_20 tax_30 tax_40 tax_50"
-local varlist2_2 = "tax_20 tax_30"
-local note = "OLS regressions. Clustered SE, deduction controls not shown. RET rank is the national rank, between 0 and 1, of subject's national performance at the real effort task. RET Deviation is the difference between actual number of correct additions and one predicted from subject and period FE."
+local varlist4="i.shock i.shock_H i.status i.status_H i.non_fixed i.l0 i.lf l_declim l_others"
+local varlist = "ncorrect_rank ncorrect_dev2 i.male age period2 i.offerdg_0 offerdg i.tax_20 i.tax_30"
+local varlist2_0 = "0.tax_20 0.tax_30 0.shock 0.shock_H 0.status 0.status_H 0.non_fixed 0.male 0.offerdg_0"
+local varlist2_4 = "0.tax_20 0.tax_30 0.tax_40 0.tax_50 1.tax_20 1.tax_30 1.tax_40 1.tax_50 0.mpcr 0.deadweight 0.shock 0.shock_H 0.status 0.status_H 0.non_fixed 0.male 0.offerdg_0"
+local varlist2_1 = "0.russia 0.oxford 0.tax_20 0.tax_30 0.tax_40 0.tax_50 1.tax_20 1.tax_30 1.tax_40 1.tax_50 0.mpcr 0.deadweight 0.shock 0.shock_H 0.status 0.status_H 0.non_fixed 0.male 0.offerdg_0"
+local note = "Average marginal effects for multinomial logistic regression. Dependent variable is whether the subject declared 0\%, 100\%, or something in between, in a given round. Standard errors are clustered by subject. RET rank is the national rank, between 0 and 1, of subject's national performance at the real effort task. RET Deviation is the difference between actual number of correct additions and one predicted from subject and period FE. Deduction controls not shown."
 
 ********************************************************************************
 **************** PERIOD 1 ****************************************************
@@ -228,11 +234,12 @@ local note = "OLS regressions. Clustered SE, deduction controls not shown. RET r
 
 local fname="`path'table_reduced1.tex"
 local conds "1==1&period2==1 country_code==1&period2==1 country_code==2&period2==1 country_code==3&period2==1"
-local varlist4="shock shock_H status status_H non_fixed"
-local varlist = "ncorrect_rank ncorrect_dev2 male age offerdg_0 offerdg tax_20 tax_30"
-local varlist2_1 = " "
-local varlist2_2 = " "
-local note = "OLS regressions. RET rank is the national rank, between 0 and 1, of subject's national performance at the real effort task. RET Deviation is the difference between actual number of correct additions and one predicted from subject and period FE."
+local varlist4="i.shock i.shock_H i.status i.status_H i.non_fixed"
+local varlist = "ncorrect_rank ncorrect_dev2 i.male age i.offerdg_0 offerdg i.tax_20 i.tax_30"
+local varlist2_0 = "0.tax_20 0.tax_30 0.shock 0.shock_H 0.status 0.status_H 0.non_fixed 0.male 0.offerdg_0"
+local varlist2_4 = "0.tax_20 0.tax_30 0.tax_40 0.tax_50 0.mpcr 0.deadweight 0.shock 0.shock_H 0.status 0.status_H 0.non_fixed 0.male 0.offerdg_0"
+local varlist2_1 = "0.russia 0.oxford 0.tax_20 0.tax_30 0.tax_40 0.tax_50 0.mpcr 0.deadweight 0.shock 0.shock_H 0.status 0.status_H 0.non_fixed 0.male 0.offerdg_0"
+local note = "Average marginal effects for multinomial logistic regression. Dependent variable is whether the subject declared 0\%, 100\%, or something in between, in a given round. RET rank is the national rank, between 0 and 1, of subject's national performance at the real effort task. RET Deviation is the difference between actual number of correct additions and one predicted from subject and period FE."
 
 
 ********************************************************************************
@@ -240,11 +247,12 @@ local note = "OLS regressions. RET rank is the national rank, between 0 and 1, o
 ********************************************************************************
 local fname="`path'table_reduced1_10_more.tex"
 local conds "1==1 country_code==1 country_code==2 country_code==3"
-local varlist4="shock shock_H status status_H non_fixed norms trust safechoices ideology income2"
-local varlist = "ncorrect_rank ncorrect_dev2 male age period2 offerdg_0 offerdg tax_20 tax_30"
-local varlist2_1 = "tax_20 tax_30 tax_40 tax_50"
-local varlist2_2 = "tax_20 tax_30"
-local note = "OLS regressions. Clustered SE, deduction controls not shown. RET rank is the national rank, between 0 and 1, of subject's national performance at the real effort task. RET Deviation is the difference between actual number of correct additions and one predicted from subject and period FE."
+local varlist4="i.shock i.shock_H i.status i.status_H i.non_fixed norms i.trust safechoices ideology income2"
+local varlist = "ncorrect_rank ncorrect_dev2 i.male age period2 i.offerdg_0 offerdg i.tax_20 i.tax_30"
+local varlist2_0 = "0.tax_20 0.tax_30 1.tax_20 1.tax_30 0.shock 0.shock_H 0.status 0.status_H 0.non_fixed 0.male 0.offerdg_0 0.trust"
+local varlist2_4 = "0.tax_20 0.tax_30 0.tax_40 0.tax_50 1.tax_20 1.tax_30 1.tax_40 1.tax_50 0.mpcr 0.deadweight 0.shock 0.shock_H 0.status 0.status_H 0.non_fixed 0.male 0.offerdg_0 0.trust"
+local varlist2_1 = "0.russia 0.oxford 0.tax_20 0.tax_30 0.tax_40 0.tax_50 1.tax_20 1.tax_30 1.tax_40 1.tax_50 0.mpcr 0.deadweight 0.shock 0.shock_H 0.status 0.status_H 0.non_fixed 0.male 0.offerdg_0 0.trust"
+local note = "Average marginal effects for multinomial logistic regression. Dependent variable is whether the subject declared 0\%, 100\%, or something in between, in a given round. Standard errors are clustered by subject. RET rank is the national rank, between 0 and 1, of subject's national performance at the real effort task. RET Deviation is the difference between actual number of correct additions and one predicted from subject and period FE.  Deduction controls not shown."
 
 *********************************************************************************
 ********** TABLES: CHOICE, COMMON PART **************************************
@@ -259,6 +267,8 @@ file write mf "\hline\hline" _n
 file close mf
 
 forval ii=1/4 {
+*forval ii=1/3 {
+*forval ii=4 {
 	local cc `: word `ii' of `conds''
 	local tt `: word `ii' of `titles''
 	local ap `: word `ii' of `aplist''
@@ -269,35 +279,35 @@ forval ii=1/4 {
 	} 
 	else if `ii'==4 {
 		local varlist3 `varlist_3_uk' 
-		local varlist2 `varlist2_1'
+		local varlist2 `varlist2_4'
 	}
 	else {
 		local varlist3=" "
-		local varlist2 `varlist2_2'
+		local varlist2 `varlist2_0'
 	}	
 	mlogit declared_cat `varlist' `varlist3' `varlist4' if `cc'&include_data==1, cluster(subj_id)
 	est store m
 	forval i=1/3 {
 		est res m
 		margins, dydx(*) predict(outcome(`i')) post
-		test tax_20=tax_30
+		test 1.tax_20=1.tax_30
 		if `ii'==1|`ii'==4 {
-			test tax_20=tax_40
-			test tax_20=tax_50
-			test tax_30=tax_40		
-			test tax_30=tax_50
+			test 1.tax_20=1.tax_40
+			test 1.tax_20=1.tax_50
+			test 1.tax_30=1.tax_40		
+			test 1.tax_30=1.tax_50
 		}	
 		*test status_H=status_L
 		*test shock_H=shock_L
 		est store m`i'
 	}
 	
-	esttab m1 m2 m3 using "`fname'", drop(`varlist2') label mtitle("Maximal cheating" "Partial cheating" "Honest") wide compress nonum title(`tt') `ap' fragment  prehead(&\multicolumn{6}{c}{\bf `tt'}\\) postfoot(\hline\hline)
+	esttab m1 m2 m3 using "`fname'", drop(`varlist2') label mtitle("Maximal cheating" "Partial cheating" "Honest") wide compress nonum title(`tt') `ap' fragment  prehead(&\multicolumn{6}{c}{\bf `tt'}\\) postfoot(\hline\hline) se star(* 0.10 ** 0.05 *** 0.01)
 }
 
 file open mf using "`fname'", write append
 file write mf "\multicolumn{7}{p{12cm}}{\tiny `note'}\\" _n
-file write mf "\multicolumn{7}{l}{\tiny \sym{*} \(p<0.05\), \sym{**} \(p<0.01\), \sym{***} \(p<0.001\)}\\" _n
+file write mf "\multicolumn{7}{l}{\tiny \sym{*} \(p<0.1\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\" _n
 file write mf "\end{tabular}"
 file close mf
 
@@ -321,17 +331,17 @@ replace declared_part_av=0 if declared_part_av==.
 
 estimates clear
 local varname="ncorrect_rank male age offerdg_0 offerdg tax_20 tax_30 status status_H non_fixed"
-reg declared_part_av `varname' if ind_typenew2==2&include_data==1&country_code==1&period2==1
+reg declared_part_av `varname' if ind_typenew2==2&include_data==1&country_code==1&period2==1, robust
 est store m1
-reg declared_part_av `varname' if ind_typenew2==2&include_data==1&country_code==2&period2==1
+reg declared_part_av `varname' if ind_typenew2==2&include_data==1&country_code==2&period2==1, robust
 est store m2
 local varname="ncorrect_rank male age offerdg_0 offerdg tax_20 tax_30 tax_40 tax_50 deadweight mpcr status status_H non_fixed"
-reg declared_part_av `varname' if ind_typenew2==2&include_data==1&country_code==3&period2==1
+reg declared_part_av `varname' if ind_typenew2==2&include_data==1&country_code==3&period2==1, robust
 est store m3
-reg declared_part_av `varname' russia oxford if ind_typenew2==2&include_data==1&period2==1
+reg declared_part_av `varname' russia oxford if ind_typenew2==2&include_data==1&period2==1, robust
 est store m4
 
-esttab m1 m2 m3 m4 using "`fname'", label mtitle("Chile" "Russia" "UK" "All") wide compress nonum replace note("OLS regressions for consistent partial cheaters. Dependent variable is the average fraction of income declared,") addnote("excluding 0\% and 100\% declarations. t-values in parenthesis.") r2
+esttab m1 m2 m3 m4 using "`fname'", label mtitle("Chile" "Russia" "UK" "All") wide compress nonum replace note("OLS regressions for consistent partial cheaters. Robust standard errors. Dependent variable is the average fraction of income declared, excluding 0\% and 100\% declarations. RET rank is the national rank, between 0 and 1, of subject's national performance at the real effort task.") r2 se star(* 0.10 ** 0.05 *** 0.01)
 
 graph drop _all
 hist declared_part_av if ind_typenew2==2&country_code==1, title(Chile) xtitle("") name(Chile)
@@ -424,7 +434,7 @@ local cc2 "1==1"
 reg declared_frac `varlist1' i.subj_id if `cc1'&`cc2'&include_data==1&declared_cat==2&ind_typenew2==2, cluster(subj_id)
 est store m6
 
-esttab m1 m2 m3 m4 m6 using "`fname'", drop(`varlist4' *subj_id) label mtitle("Periods 1-10" "Periods 2-10" "Period 1" "Periods 1-10" "Periods 1-10, FE") wide compress nonum replace  note("OLS regressions. Clustered SE. Consistent partial cheaters. Dependent variable is the fraction of income" "declared in a given round, excluding 0\% and 100\% declarations. t-values in parenthesis." "RET rank is the national rank, between 0 and 1, of subject's national performance at the real effort task. RET Deviation is the difference between" "actual number of correct additions and one predicted from subject and period FE.") r2
+esttab m1 m2 m3 m4 m6 using "`fname'", drop(`varlist4' *subj_id) label mtitle("Periods 1-10" "Periods 2-10" "Period 1" "Periods 1-10" "Periods 1-10, FE") wide compress nonum replace  note("OLS regressions for consistent partial cheaters. Standard errors are clustered by subject. Consistent partial cheaters. Dependent variable is the fraction of income declared in a given round, excluding 0\% and 100\% declarations. t-values in parenthesis." "RET rank is the national rank, between 0 and 1, of subject's national performance at the real effort task. RET Deviation is the difference between actual number of correct additions and one predicted from subject and period FE.") r2 se star(* 0.10 ** 0.05 *** 0.01)
 
 
 ******************************************************************
@@ -576,6 +586,7 @@ forval ii=1/3 {
 	}
 	file write mf "\hline"	
 }
+file write mf "\multicolumn{11}{p{\textwidth}}{\footnotesize For each country, the first two rows report the frequencies of declarations for two groups of subjects. The third row reports the p-value for Fisher's exact test comparing these two frequencies.}\\" _n
 file write mf "\end{tabular}"
 file close mf
 
@@ -644,15 +655,15 @@ local varlist4 = "shock status status_H non_fixed norms trust safechoices ideolo
 local vv = "russia oxford"
 
 estimates clear
-reg ncorrect_subjav `varlist1' `varlist4' if period2==1&include_data==1&country_code==1
+reg ncorrect_subjav `varlist1' `varlist4' if period2==1&include_data==1&country_code==1, robust
 est store m1
-reg ncorrect_subjav `varlist1' `varlist4' if period2==1&include_data==1&country_code==2
+reg ncorrect_subjav `varlist1' `varlist4' if period2==1&include_data==1&country_code==2, robust
 est store m2 
-reg ncorrect_subjav `varlist1' `varlist2' `varlist4' if period2==1&include_data==1&country_code==3
+reg ncorrect_subjav `varlist1' `varlist2' `varlist4' if period2==1&include_data==1&country_code==3, robust
 est store m3 
-reg ncorrect_subjav `varlist1' `varlist2' `vv' `varlist4' if period2==1&include_data==1
+reg ncorrect_subjav `varlist1' `varlist2' `vv' `varlist4' if period2==1&include_data==1, robust
 est store m4
-esttab m1 m2 m3 m4 using "`fname'", label mtitle("Chile" "Russia" "UK" "All") wide compress nonum replace order(`varlist1' `varlist2' `vv' `varlist4') note("OLS regression. Dependent variable is subject's average performance over 10 rounds.")
+esttab m1 m2 m3 m4 using "`fname'", label mtitle("Chile" "Russia" "UK" "All") wide compress nonum replace order(`varlist1' `varlist2' `vv' `varlist4') note("OLS regression. Robust standard errors. Dependent variable is subject's average performance over 10 rounds.") se r2 star(* 0.10 ** 0.05 *** 0.01)
 
 
 ******************************************************************
@@ -678,7 +689,7 @@ est store m3
 reg ncorrectret `varlist1' `varlist2' `vv' `varlist4' if period2>1.&include_data==1, cluster(subj_id)
 est store m4
 esttab m1 m2 m3 m4
-esttab m1 m2 m3 m4 using "`fname'", label mtitle("Chile" "Russia" "UK" "All") drop(`varlist5') wide compress nonum replace order(`varlist1' `varlist2' `vv' `varlist4') note("OLS regression. Clustered SE. Deduction controls not shown. Dependent variable is number of correct answers in a given round.")
+esttab m1 m2 m3 m4 using "`fname'", label mtitle("Chile" "Russia" "UK" "All") drop(`varlist5') wide compress nonum replace order(`varlist1' `varlist2' `vv' `varlist4') note("Standard errors are clustered by subject. RET rank is the national rank, between 0 and 1, of subject's national performance at the real effort task. RET Deviation is the difference between actual number of correct additions and one predicted from subject and period FE.") r2 se star(* 0.10 ** 0.05 *** 0.01)
 
 
 
