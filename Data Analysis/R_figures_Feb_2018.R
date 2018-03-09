@@ -24,7 +24,7 @@ library(car)
 
 rm(list=ls())
 
-setwd("C:/Users/Denise Laroze Prehn/Dropbox/CESS-Santiago/Archive/Tax Compliance Moscow/Raw Data")
+setwd("C:/Users/Denise Laroze P/Dropbox/CESS-Santiago/Archive/Tax Compliance Moscow/Raw Data")
 fig.path <- "Figures"
 v<-"March2018"
 
@@ -298,11 +298,13 @@ d<-ggplot(prop.t, aes(x = type, y = prop, colour=perform_high_lab, fill=perform_
   ylab("Percent") + scale_y_continuous(labels = scales::percent , limits = c(0,1)) +
   xlab("") + labs(colour="", fill="") +
   scale_fill_manual("", values = c("red", "blue"))+
+  theme(text = element_text(size=20))+
   #geom_hline(yintercept = 1/6, lty="dashed", col="red")+
-  facet_wrap(~  country, ncol = 3) +  theme(legend.position="bottom")
+  facet_wrap(~  country, ncol = 3) +  
+  theme(legend.position="bottom", legend.text=element_text(size=20))
 d
 
-ggsave(paste0("cheater_type_performance2",v, ".pdf"), path=fig.path, width = 12, height = 5)
+ggsave(paste0("FigureB2",v, ".pdf"), path=fig.path, width = 12, height = 5)
 
 ###############################
 ### Figure C2
