@@ -7,10 +7,14 @@ The decision to cheat is a frequent and relatively mundane economic decision tha
 This repository includes replication code for experimental sessions and data analysis for the manuscript titled “Is Cheating a National Pastime? Experimental Evidence”. 
 
 
-Experimental sessions include:
+Code to replicate experimental sessions:
  - Santiago 2015 MT - Baseline	
  - Santiago 2015 MT - Shock	
  - Santiago 2015 MT - Status	
  - Santiago 2016 MT - Non-Fixed
  - Dice images used for the virtual die in the Non-Fixed treatment
+ 
+ Code to replicate data analysis and figures
+ 
+ Screenshots of the experiment
 
