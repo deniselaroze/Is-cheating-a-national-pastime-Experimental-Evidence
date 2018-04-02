@@ -18,3 +18,4 @@ Code to replicate experimental sessions:
  
  Screenshots of the experiment
 
+### All replication material for "Why we Cheat" Duch and Solaz can be found in https://github.com/rayduch/Why-we-Cheat-2016 
