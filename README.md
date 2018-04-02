@@ -18,3 +18,5 @@ Code to replicate experimental sessions:
  
  Screenshots of the experiment
 
+### All replication material for the English version of the experiment, first presenten in the paper "Why we Cheat" by Duch and Solaz, can be found in https://github.com/rayduch/Why-we-Cheat-2016 
+
