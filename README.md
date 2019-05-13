@@ -1,3 +1,6 @@
+### This repository is a past version of the manuscript "Once a Liar" that was submitted for review in Jan 2019. The repository for the final version of the manuscript is available at https://github.com/deniselaroze/Once-a-Liar 
+
+
 # Is-cheating-a-national-pastime-Experimental-Evidence
 
 Raymond Duch, Denise Laroze and Alexei Zakharov (alphabetical order)
